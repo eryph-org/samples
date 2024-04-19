@@ -1,0 +1,70 @@
+name: cinc-node
+parent: dbosoft/ubuntu-22.04/latest
+
+project: cinc
+
+memory: 
+  startup: 1024
+  minimum: 1024
+  maximum: 4096
+
+fodder:
+- name: admin
+  type: cloud-config
+  secret: true
+  content: |
+    users:
+    - name: admin
+      group: admin
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      ssh-authorized-keys:
+      - {{sshkey}}
+
+- name: cincclient
+  type: cloud-config
+  content: |
+    # chef module cannot configure client for cinc
+    # do it manully
+    write_files:      
+    - path: /etc/cinc/client.rb
+      content:  |
+        log_level              :info
+        ssl_verify_mode        :verify_none
+        log_location           "/var/log/cinc/client.log"
+        validation_client_name "dev-validator"
+        validation_key         "/etc/cinc/validation.pem"
+        client_key             "/etc/cinc/client.pem"
+        chef_server_url        "https://10.0.0.130/organizations/dev"
+        node_name              "{{catletId}}"
+        json_attribs           "/etc/cinc/firstboot.json"
+        file_cache_path        "/var/cache/cinc"
+        file_backup_path       "/var/backups/cinc"
+        pid_file               "/var/run/cinc/client.pid"       
+      
+    chef:
+      chef_license: "accept"
+      install_type: "omnibus"
+      force_install: false
+      server_url: "https://10.0.0.130/organizations/dev"
+      validation_name: "validation"
+      validation_key: /etc/cinc/validation.pem
+      validation_cert: |
+        {{validation_key}}
+
+      # Specify a list of initial attributes used by the cookbooks
+      initial_attributes:
+        apache:
+          prefork:
+            maxclients: 100
+          keepalive: "off"
+      exec: false    
+      omnibus_url: "https://omnitruck.cinc.sh/install.sh"
+      omnibus_version: "18"
+      firstboot_path: /etc/cinc/firstboot.json
+
+- name: cinc-run
+  type: shellscript
+  content: |
+    #!/bin/sh
+    mkdir /var/log/cinc/
+    cinc-client

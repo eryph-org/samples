@@ -1,0 +1,8 @@
+current_dir = File.dirname(__FILE__)
+log_level                :info
+log_location             STDOUT
+node_name                "cinc-user"
+client_key               "#{current_dir}/cinc-user.pem"
+chef_server_url          "https://{{cinc_ip}}/organizations/dev"
+cookbook_path            ["#{current_dir}/../cookbooks"]
+ssl_verify_mode          :verify_none

@@ -1,0 +1,51 @@
+name: cinc-node
+parent: dbosoft/winsrv2019-standard/latest
+
+project: cinc
+
+memory: 
+  startup: 2048
+  minimum: 1024
+  maximum: 8192
+
+fodder:
+- name: admin-windows
+  source: gene:dbosoft/starter-food:win-starter
+
+- type: cloud-config
+  content: |
+    write_files:      
+    - content: |
+        {{validation_key}}
+      path: C:\cinc\validator.pem
+    - path: C:\cinc\client.rb
+      content:  |
+        log_level              :info
+        log_location           "c:/logs/cinc/client.log"
+        ssl_verify_mode        :verify_none
+        validation_client_name "dev-validator"
+        validation_key         "c:/cinc/validator.pem"
+        client_key             "c:/cinc/client.pem"
+        chef_server_url        "https://10.0.0.130/organizations/dev"
+        node_name              "{{catletId}}"
+          
+    - content: |
+        {  }
+      path: C:\cinc\first-boot.json
+
+- type: shellscript
+  file_name: install_cinc.ps1  #this is only required due to a bug in cloudbase-init
+  content: |
+    #ps1
+
+    # to speed up booting exclude cinc from Defender
+    Add-MpPreference -ExclusionPath "c:\cinc-project"
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    . { iwr -useb https://omnitruck.cinc.sh/install.ps1 } | iex; install -version 17
+
+    mkdir c:\logs\cinc
+    c:\cinc-project\cinc\bin\cinc-client.bat -j c:\cinc\first-boot.json
+    
+    Start-Sleep -Seconds 30
+    rm C:\cinc\validator.pem
+    rm c:\cinc\first-boot.json

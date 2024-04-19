@@ -1,0 +1,28 @@
+name: cinc-server
+parent: dbosoft/ubuntu-22.04/latest
+
+project: cinc
+
+memory: 
+  startup: 4096
+
+networks: 
+- name: server
+
+fodder:
+- name: admin
+  type: cloud-config
+  secret: true
+  content: |
+    users:
+    - name: admin
+      group: admin
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      ssh-authorized-keys:
+      - {{sshkey}}
+
+- name: cincserver
+  type: cloud-config
+  content: |    
+    runcmd:
+      - touch /installed
