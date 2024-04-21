@@ -1,11 +1,8 @@
-$sysCred = Get-EryphClientCredentials -SystemClient -Configuration zero
+#Requires -RunAsAdministrator
 
-if(-not $sysCred){
-    return
-}
+$ErrorActionPreference = "Stop"
 
 Push-Location $PSScriptRoot
-
 
 Write-Information "Checking if ssh is installed" -InformationAction Continue
 
@@ -32,6 +29,13 @@ if(-not $zeroCommand){
 
 
 Write-Information "Checking credentials for eryph..." -InformationAction Continue
+
+$sysCred = Get-EryphClientCredentials -SystemClient -Configuration zero
+
+if(-not $sysCred){
+    return
+}
+
 Set-EryphConfigurationStore -All CurrentDirectory
 $configuration = Get-EryphClientConfiguration -Configuration zero -ErrorAction SilentlyContinue
 
@@ -54,11 +58,11 @@ if(-not $project){
     Write-Information "Creating a new eryph project" -InformationAction Continue
     $project = New-EryphProject cinc -Credentials $sysCred
     Add-EryphProjectMemberRole -ProjectName cinc -MemberId $clientId -Role owner -Credentials $sysCred
-    Get-Content network.yaml | Set-VNetwork
 }else{
     Write-Information "project 'cinc' found" -InformationAction Continue
 }
 
+Get-Content network.yaml | Set-VNetwork
 
 Pop-Location
 

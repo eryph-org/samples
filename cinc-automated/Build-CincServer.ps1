@@ -9,15 +9,17 @@ param (
     [switch] $Force
 )
 
+$ErrorActionPreference = "Stop"
+
 push-location $PSScriptRoot
 Set-EryphConfigurationStore -All CurrentDirectory
 
 if(-not (Test-Path .ssh\sshkey)){
     mkdir .keys -ErrorAction SilentlyContinue | Out-Null
-    ssh-keygen -b 2048 -t rsa -f .ssh\sshkey -q -N ''
+    ssh-keygen -b 2048 -t rsa -f .ssh\sshkey -q -N '""'
 }
 
-$sshKey = gc .ssh\sshkey.pub
+$sshKey = Get-Content .ssh\sshkey.pub
 $ip = ""
 
 function invoke-ssh(
@@ -57,7 +59,7 @@ Start-Sleep -Seconds 30
 
 arp -d *
 
-$catlet = Get-Catlet | where Name -eq $catletName
+$catlet = Get-Catlet | Where-Object Name -eq $catletName
 $ipInfo = Get-CatletIp -Id $catlet.Id
 $ip = $ipInfo.IpAddress
 
