@@ -1,0 +1,106 @@
+
+name : sqlserver
+parent: dbosoft/winsrv2022-standard/latest
+
+drives:
+  - name: install
+    source: {{sqlserver_iso}}
+    size: 1
+    type: dvd
+
+fodder:    
+ - name: admin-windows
+   type: cloud-config
+   secure: true
+   content: |
+    users:
+      - name: Admin
+        groups: [ "Administrators" ]
+        passwd: {{password}}
+
+ - name: setup-dsc
+   type: shellscript
+   fileName: setup_dsc.ps1
+   content: |
+    #ps1
+    $erroractionpreference = "stop"
+    Start-Transcript -Path c:\DSCInstall.log -Append
+
+    Get-PackageProvider NuGet -ForceBootstrap | Out-Null;
+    Set-PSRepository PSGallery -InstallationPolicy Trusted | Out-Null
+    Install-Module 'PSDscResources' -Force
+
+ - name: prepare-sqlserver
+   type: shellscript
+   fileName: SQLInstallConfiguration.ps1
+   content: |
+    #ps1
+
+    $config = @"
+    Configuration SQLInstall
+    {
+        Import-DscResource -ModuleName PSDesiredStateConfiguration
+        Import-DscResource -ModuleName SqlServerDsc
+
+        node localhost
+        {
+              WindowsFeature 'NetFramework45'
+              {
+                  Name   = 'NET-Framework-45-Core'
+                  Ensure = 'Present'
+              }
+
+              SqlSetup 'InstallDefaultInstance'
+              {
+                  InstanceName        = 'MSSQLSERVER'
+                  Features            = 'SQLENGINE'
+                  SourcePath          = 'd:'
+                  SQLSysAdminAccounts = @('Administrators')
+                  DependsOn           = '[WindowsFeature]NetFramework45'
+              }
+        }
+    }
+    "@
+    Start-Transcript -Path c:\SQLInstall.log -Append
+    $config | Out-File -FilePath c:\SQLInstallConfiguration.ps1 -Force
+
+    Install-Module -Name SqlServerDsc -Force
+    cd c:\
+    . c:\SQLInstallConfiguration.ps1
+    SQLInstall
+
+ - name: EnablePSRemoting
+   type: shellscript
+   fileName: enable_remoting.ps1
+   content: |
+    Enable-PSRemoting -Force
+
+ - name: install-sqlserver
+   type: shellscript
+   fileName: SQLInstall.ps1
+   content: |
+    #ps1
+    Start-Transcript -Path c:\SQLInstall.log -Append
+
+    cd c:\
+
+    Start-DscConfiguration -Path c:\SQLInstall -Wait -Force -Verbose -ErrorAction Stop
+
+    $status = Get-DscConfigurationStatus
+
+    if($status.Status -eq "Success"){
+        "installed" | Out-File c:\SQLInstallStatus.txt -Force
+
+        if($status.RebootRequested){
+            Write-Information "Rebooting"
+            exit 1003
+        }
+    }else{
+      "failed" | Out-File c:\SQLInstallStatus.txt -Force
+    }
+    
+    Get-NetFirewallRule -name *ICMP4* | Set-NetFirewallRule -Enabled True
+    exit 0
+    
+
+    
