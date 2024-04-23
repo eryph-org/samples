@@ -14,6 +14,10 @@ $ErrorActionPreference = "Stop"
 push-location $PSScriptRoot
 Set-EryphConfigurationStore -All CurrentDirectory
 
+if(-not (Test-Path .ssh\)){
+  mkdir .ssh
+}
+
 if(-not (Test-Path .ssh\sshkey)){
     mkdir .keys -ErrorAction SilentlyContinue | Out-Null
     ssh-keygen -b 2048 -t rsa -f .ssh\sshkey -q -N '""'
