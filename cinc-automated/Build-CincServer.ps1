@@ -14,13 +14,17 @@ $ErrorActionPreference = "Stop"
 push-location $PSScriptRoot
 Set-EryphConfigurationStore -All CurrentDirectory
 
-if(-not (Test-Path .ssh\)){
-  mkdir .ssh
-}
-
 if(-not (Test-Path .ssh\sshkey)){
-    mkdir .keys -ErrorAction SilentlyContinue | Out-Null
+    mkdir .ssh -ErrorAction SilentlyContinue | Out-Null
     ssh-keygen -b 2048 -t rsa -f .ssh\sshkey -q -N '""'
+
+    # check if this version of ssh-keygen requires a different syntax
+    ssh-keygen -y -P '""' -f .\.ssh\sshkey | Out-Null
+    if($LASTEXITCODE -ne 0){
+        Remove-Item .\.ssh\sshkey
+        ssh-keygen -b 2048 -t rsa -f .ssh\sshkey -q -N ''
+    }
+
 }
 
 $sshKey = Get-Content .ssh\sshkey.pub
@@ -54,7 +58,6 @@ Write-Information "booting catlet" -InformationAction Continue
 $catletConfig = Get-Content ./cinc-server.yaml
 $catletConfig = $catletConfig.replace("{{sshkey}}", $sshKey)
 
-$catletConfig | Set-Content test.yaml
 $catletConfig | New-Catlet -Name $catletName -ErrorAction Stop | Start-Catlet -Force -ErrorAction Stop
 
 Write-Information "waiting 30 seconds" -InformationAction Continue
