@@ -57,10 +57,21 @@ if(-not $project){
 
     Write-Information "Creating a new eryph project" -InformationAction Continue
     $project = New-EryphProject cinc -Credentials $sysCred
-    Add-EryphProjectMemberRole -ProjectName cinc -MemberId $clientId -Role owner -Credentials $sysCred
 }else{
     Write-Information "project 'cinc' found" -InformationAction Continue
 }
+
+$role = Get-EryphProjectMemberRole -ProjectName cinc `
+    | Where-Object ProjectId -eq ($project.Id) `
+    | Where-Object MemberId -eq $clientId
+
+if(-not $role){
+    Write-Information "Adding client to project" -InformationAction Continue
+    Add-EryphProjectMemberRole -ProjectName cinc -MemberId $clientId -Role owner -Credentials $sysCred
+}else{
+    Write-Information "Client is already a member of project" -InformationAction Continue
+}
+
 
 Get-Content network.yaml | Set-VNetwork
 
