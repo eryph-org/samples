@@ -37,7 +37,7 @@ function invoke-ssh(
 ){
     push-location $PSScriptRoot
     $sshKeyPath = Resolve-Path .ssh\sshkey
-    &ssh -q admin@$ip -o "IdentitiesOnly=yes" -o "StrictHostKeyChecking=no" -i $sshKeyPath -C $command
+    ssh -q admin@$ip -o "IdentitiesOnly=yes" -o "StrictHostKeyChecking=no" -i $sshKeyPath -C $command
     Pop-location
 }
 
@@ -67,16 +67,20 @@ Start-Sleep -Seconds 30
 arp -d *
 
 $catlet = Get-Catlet | Where-Object Name -eq $catletName
-$ipInfo = Get-CatletIp -Id $catlet.Id
+$catletId = $catlet.Id
+$ipInfo = Get-CatletIp -Id $catletId 
 $ip = $ipInfo.IpAddress
 
 do {
     Write-Information "Waiting for bootstrapping to finish..." -InformationAction Continue
     Start-Sleep -Seconds 5
-    $finished = invoke-ssh '[ -f /installed ] && echo "found" || echo "wait";'
-
+    # dir command? due to this issue: https://github.com/PowerShell/Win32-OpenSSH/issues/1334
+    $finished = invoke-ssh '[ -f /installed ] && echo "found" || echo "wait"; dir; exit 0;'
+    if(!$finished){
+        $finished = ""
+    }
     
-} until ("found" -eq $finished)
+} until ($finished.startsWith("found"))
 
 Write-Information "Downloading and installing cinc-server. Please note that cinc downloads are quite slow, so it will take some time." -InformationAction Continue
 invoke-ssh 'curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-server -v 14'
