@@ -81,7 +81,6 @@ if($parent) {
 } else{
     $catlet = $catletConfig | New-Catlet -Name $catletName | Start-Catlet -Force -ErrorAction Stop
 }
-arp -d *
 
 if($os -eq 'Linux'){
     Write-Information "Wait 30 seconds for node bootstrapping..." -InformationAction Continue

@@ -63,9 +63,6 @@ $catletConfig | New-Catlet -Name $catletName -ErrorAction Stop | Start-Catlet -F
 Write-Information "waiting 30 seconds" -InformationAction Continue
 Start-Sleep -Seconds 30
 
-
-arp -d *
-
 $catlet = Get-Catlet | Where-Object Name -eq $catletName
 $catletId = $catlet.Id
 $ipInfo = Get-CatletIp -Id $catletId 
