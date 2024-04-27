@@ -26,7 +26,7 @@ fodder:
         validation_client_name "dev-validator"
         validation_key         "c:/cinc/validator.pem"
         client_key             "c:/cinc/client.pem"
-        chef_server_url        "https://10.0.0.130/organizations/dev"
+        chef_server_url        "https://cinc-server.cinc.internal/organizations/dev"
         node_name              "{{catletId}}"
           
     - content: |

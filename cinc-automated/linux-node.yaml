@@ -34,7 +34,7 @@ fodder:
         validation_client_name "dev-validator"
         validation_key         "/etc/cinc/validation.pem"
         client_key             "/etc/cinc/client.pem"
-        chef_server_url        "https://10.0.0.130/organizations/dev"
+        chef_server_url        "https://cinc-server.cinc.internal/organizations/dev"
         node_name              "{{catletId}}"
         json_attribs           "/etc/cinc/firstboot.json"
         file_cache_path        "/var/cache/cinc"
@@ -45,7 +45,7 @@ fodder:
       chef_license: "accept"
       install_type: "omnibus"
       force_install: false
-      server_url: "https://10.0.0.130/organizations/dev"
+      server_url: "https://cinc-server.cinc.internal/organizations/dev"
       validation_name: "validation"
       validation_key: /etc/cinc/validation.pem
       validation_cert: |
