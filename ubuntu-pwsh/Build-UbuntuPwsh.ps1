@@ -1,5 +1,5 @@
 #Requires -Version 6
-#Requires -Module Eryph.ComputeClient
+#Requires -Modules Eryph.ComputeClient
 [CmdletBinding()]
 param (
     [Parameter(Mandatory=$false)]
