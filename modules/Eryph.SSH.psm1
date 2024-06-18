@@ -34,6 +34,11 @@ function New-SSHKey {
         Remove-Item "$KeyFilePath*"
     }
 
+    $keyDirectoryPath = [System.IO.Path]::GetDirectoryName($KeyFilePath)
+    if (-not (Test-Path $keyDirectoryPath)) {
+        New-Item -ItemType Directory -Path $keyDirectoryPath
+    }
+
     if ((-not $keyExists) -or $Force) {
         $null = ssh-keygen -b 2048 -t rsa -f $KeyFilePath -q -N '""'
         if (-not $?) {
