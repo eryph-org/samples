@@ -15,7 +15,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module -Name "$PSScriptRoot/../modules/Eryph.SSH.psm1"
 
 if (-not $Credentials) {
-    $Credentials = Get-Credential -Message "Please provide username and password for your new catlet." #-Title "Catlet credentials"
+    $Credentials = Get-Credential -Message "Please provide username and password for your new catlet."
 }
 
 $sshKeyDirectory = Join-Path $PSScriptRoot ".ssh"
