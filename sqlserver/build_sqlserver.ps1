@@ -1,3 +1,5 @@
+#Requires -Version 5.1
+#Requires -Module Eryph.ComputeClient
 [CmdletBinding()]
 param (
 
@@ -5,58 +7,68 @@ param (
     [string]$CatletName = 'sqlserver',
 
     [Parameter(Mandatory=$true)]
-    [string]$SQLServerISO
+    [string]$SQLServerISO,
+
+    [Parameter(Mandatory=$false)]
+    [System.Management.Automation.Credential()]
+    [System.Management.Automation.PSCredential] $Credentials 
 )
 
 $ErrorActionPreference = 'Stop'
+
+if (-not [System.IO.Path]::IsPathRooted($SQLServerISO)) {
+    $SQLServerISO = (Join-Path $PSScriptRoot $SQLServerISO)
+}
 
 if(-not (Test-Path $SQLServerISO)){
     Write-Error "SQL Server ISO file not found"
     return
 }
 
-$pwUnsecure = "InitialPassw0rd"
-$pw = ConvertTo-SecureString $pwUnsecure -AsPlainText -Force
-$Cred = New-Object System.Management.Automation.PSCredential ("Admin", $pw)
+if (-not $Credentials) {
+    $Credentials = Get-Credential -Message "Please provide username and password for your new catlet. The password must meet Windows Server password rules (at least 8 characters and must contain upper case, lower case and digits)."
+}
 
-push-location $PSScriptRoot
-
-Write-Host "removing existing catlet, if it exists"
+Write-Information "Removing existing catlet (if it exists)..." -InformationAction Continue
 Get-Catlet | Where-Object Name -eq $catletName | Remove-Catlet -Force
 
-Write-Host "booting catlet"
-$catletConfig = Get-Content ./sqlserver.yaml
-$catletConfig = $catletConfig.replace("{{password}}", $pwUnsecure)
-$catletConfig = $catletConfig.replace("{{sqlserver_iso}}", $SQLServerISO)
+Write-Information "Booting catlet..." -InformationAction Continue
+$catletConfig = Get-Content -Raw -Path (Join-Path $PSScriptRoot "sqlserver.yaml")
+$catletConfig = $catletConfig.Replace("{{ sqlserver_iso }}", $SQLServerISO)
 
-$catletConfig | New-Catlet -Name $catletName | Start-Catlet -Force
+$catlet = New-Catlet `
+    -Name $catletName `
+    -Config $catletConfig `
+    -Variables @{
+        username = $Credentials.GetNetworkCredential().UserName
+        password = $Credentials.GetNetworkCredential().Password
+    } `
+    -SkipVariablesPrompt
 
-Write-Host "waiting 3 minutes"
+Start-Catlet -Id $catlet.Id -Force
+
+Write-Information "Waiting 3 minutes..." -InformationAction Continue
 Start-Sleep -Seconds 180
 
-arp -d *
-
-$catlet = Get-Catlet | Where-Object Name -eq $catletName
-$catletId = $catlet.Id
-$ipInfo = Get-CatletIp -Id $catletId
+$ipInfo = Get-CatletIp -Id $catlet.Id
 $ip = $ipInfo.IpAddress
 
 do {
-    Write-Host "Waiting for connection..."
+    Write-Information "Waiting for connection..." -InformationAction Continue
     Start-Sleep -Seconds 10
     $ping = Test-Connection -ComputerName $ip -Count 1 -Quiet
 } until ($ping)
 
 $opt = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
-$session = new-PSSession -ComputerName $ip -Credential $cred -UseSSL -Authentication Basic -SessionOption $opt
+$session = new-PSSession -ComputerName $ip -Credential $Credentials -UseSSL -Authentication Basic -SessionOption $opt
 Invoke-Command -Session $session -scriptblock {
 
     $finished = Test-Path c:\SQLInstallStatus.txt
 
-    if($finished){ return }
+    if ($finished) { return }
 
     do {
-        Write-Host "Waiting for SQLServer installation to finish..."
+        Write-Information "Waiting for SQLServer installation to finish..." -InformationAction Continue
         Start-Sleep -Seconds 10
         $finished = Test-Path c:\SQLInstallStatus.txt
     } until ($finished)
@@ -67,8 +79,8 @@ $status = Invoke-Command -Session $session -scriptblock {
     return Get-Content c:\SQLInstallStatus.txt
 }
 
-if($status -eq "failed"){
-    Write-Host "SQL Server installation failed"
+if ($status -eq "failed") {
+    Write-Error "SQL Server installation failed"
 
     $logContent = Invoke-Command -Session $session -scriptblock {
         return Get-Content c:\SQLInstall.log
@@ -79,7 +91,7 @@ if($status -eq "failed"){
     exit
 }
 
-Write-Host "catlet $catletname is ready for testing"
+Write-Information "Catlet $catletname is ready for testing" -InformationAction Continue
 
 # run Tests
 

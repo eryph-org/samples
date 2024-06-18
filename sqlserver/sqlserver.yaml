@@ -1,22 +1,28 @@
-
 name : sqlserver
 parent: dbosoft/winsrv2022-standard/latest
 
 drives:
   - name: install
-    source: {{sqlserver_iso}}
+    source: {{ sqlserver_iso }}
     size: 1
     type: dvd
+
+variables:
+  - name: username
+    value: Admin
+    required: true
+  - name: password
+    required: true
+    secret: true
 
 fodder:    
  - name: admin-windows
    type: cloud-config
-   secure: true
    content: |
     users:
-      - name: Admin
+      - name: {{ username }}
         groups: [ "Administrators" ]
-        passwd: {{password}}
+        passwd: {{ password }}
 
  - name: setup-dsc
    type: shellscript
