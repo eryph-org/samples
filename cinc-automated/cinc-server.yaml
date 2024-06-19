@@ -25,7 +25,7 @@ fodder:
   type: cloud-config
   content: |
     users:
-    - name: {{ username }}
+    - name: '{{ username }}'
       group: admin
       sudo: 'ALL=(ALL) NOPASSWD:ALL'
       ssh-authorized-keys:

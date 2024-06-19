@@ -20,8 +20,8 @@ fodder:
     type: cloud-config
     content: |
       users:
-        - name: {{ username }}
-          plain_text_passwd: {{ password }}
+        - name: '{{ username }}'
+          plain_text_passwd: '{{ password }}'
           groups:
             - admin
           lock_passwd: true

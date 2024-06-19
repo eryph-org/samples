@@ -28,11 +28,11 @@ fodder:
   secret: true
   content: |
     users:
-    - name: {{ username }}
+    - name: '{{ username }}'
       group: admin
       sudo: 'ALL=(ALL) NOPASSWD:ALL'
       ssh-authorized-keys:
-      - '{{ sshPublicKey }}''
+      - '{{ sshPublicKey }}'
 
 - name: cincclient
   type: cloud-config

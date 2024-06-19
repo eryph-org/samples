@@ -20,9 +20,9 @@ fodder:
    type: cloud-config
    content: |
     users:
-      - name: {{ username }}
+      - name: '{{ username }}'
         groups: [ "Administrators" ]
-        passwd: {{ password }}
+        passwd: '{{ password }}'
 
  - name: setup-dsc
    type: shellscript
