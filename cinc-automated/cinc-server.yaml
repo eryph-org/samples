@@ -3,11 +3,22 @@ parent: dbosoft/ubuntu-22.04/latest
 
 project: cinc
 
+capabilities:
+  - name: secure_boot
+    details: ['template:MicrosoftUEFICertificateAuthority']
+
 memory: 
   startup: 4096
 
 networks: 
 - name: server
+
+variables:
+- name: username
+  value: admin
+  required: true
+- name: sshPublicKey
+  required: true
 
 fodder:
 - name: admin
@@ -15,14 +26,15 @@ fodder:
   secret: true
   content: |
     users:
-    - name: admin
+    - default
+    - name: {{ username }}
       group: admin
-      sudo: ALL=(ALL) NOPASSWD:ALL
+      sudo: 'ALL=(ALL) NOPASSWD:ALL'
       ssh-authorized-keys:
-      - {{sshkey}}
+      - '{{ sshPublicKey }}'
 
 - name: cincserver
   type: cloud-config
-  content: |    
+  content: |
     runcmd:
       - touch /installed
