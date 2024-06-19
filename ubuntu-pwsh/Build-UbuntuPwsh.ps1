@@ -12,7 +12,7 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-Import-Module -Name "$PSScriptRoot/../modules/Eryph.SSH.psm1"
+Import-Module -Name "$PSScriptRoot/../modules/Eryph.SSH.psm1" -Force
 
 if (-not $Credentials) {
     $Credentials = Get-Credential -Message "Please provide username and password for your new catlet."
@@ -23,7 +23,7 @@ $sshKeyName = "sshkey"
 $sshKeyPath = Join-Path $sshKeyDirectory $sshKeyName
 
 Install-SSHClient
-$sshPublicKey = New-SSHKey -KeyFilePath $sshKeyPath -Force
+$sshPublicKey = New-SSHKey -KeyFilePath $sshKeyPath
 
 Write-Information "Removing existing catlet (if it exists)..." -InformationAction Continue
 Get-Catlet | Where-Object Name -eq $catletName | Remove-Catlet -Force

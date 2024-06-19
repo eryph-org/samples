@@ -48,7 +48,6 @@ fodder:
     content: |
       #!/bin/bash
       echo 'Subsystem powershell /usr/bin/pwsh -sshs' >> /etc/ssh/sshd_config.d/99-powershell.conf
-      echo 'PubKeyAuthentication yes' >> /etc/ssh/sshd_config.d/99-powershell.conf
       service ssh restart
 
   - source: gene:dbosoft/cm-tools/0.4.1:hello-world-linux

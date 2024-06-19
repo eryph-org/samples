@@ -31,16 +31,16 @@ function New-SSHKey {
     $keyExists = Test-Path $KeyFilePath
 
     if ($keyExists -and $Force) {
-        Remove-Item "$KeyFilePath*"
+        Remove-Item "$KeyFilePath"
     }
 
     $keyDirectoryPath = [System.IO.Path]::GetDirectoryName($KeyFilePath)
     if (-not (Test-Path $keyDirectoryPath)) {
-        New-Item -ItemType Directory -Path $keyDirectoryPath
+        $null = New-Item -ItemType Directory -Path $keyDirectoryPath
     }
 
     if ((-not $keyExists) -or $Force) {
-        $null = ssh-keygen -b 2048 -t rsa -f $KeyFilePath -q -N '""'
+        $null = ssh-keygen -t ed25519 -f $KeyFilePath -q -N '""'
         if (-not $?) {
             throw "Could not generate the SSH key."
         }
@@ -106,6 +106,10 @@ function Invoke-SSH {
         -o 'StrictHostKeyChecking=no' `
         -i $KeyFilePath `
         -C $Command
+
+    if (-not $?) {
+        throw "The execution of the SSH command failed."
+    }
     
     return $result
 }
