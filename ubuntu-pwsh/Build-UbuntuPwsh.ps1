@@ -12,7 +12,7 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-Import-Module -Name "$PSScriptRoot/../modules/Eryph.SSH.psm1" -Force
+Import-Module -Name "$PSScriptRoot/../modules/Eryph.SSH.psm1"
 
 if (-not $Credentials) {
     $Credentials = Get-Credential -Message "Please provide username and password for your new catlet."
