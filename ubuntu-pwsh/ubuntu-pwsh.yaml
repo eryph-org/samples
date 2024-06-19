@@ -20,7 +20,6 @@ fodder:
     type: cloud-config
     content: |
       users:
-        - default
         - name: {{ username }}
           plain_text_passwd: {{ password }}
           groups:

@@ -23,10 +23,8 @@ variables:
 fodder:
 - name: admin
   type: cloud-config
-  secret: true
   content: |
     users:
-    - default
     - name: {{ username }}
       group: admin
       sudo: 'ALL=(ALL) NOPASSWD:ALL'

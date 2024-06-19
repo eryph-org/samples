@@ -31,12 +31,12 @@ if (-not (Test-Path .cinc\org-validator.pem)) {
     return
 }
 
-$cincCalidationKey = Get-Content -Raw .cinc\org-validator.pem
+$cincValidationKey = Get-Content -Raw .cinc\org-validator.pem
 # We escape the line breaks as the validation key is inserted
 # into the YAML cloud-init configuration. Inside the YAML,
 # the string is in double quotes which makes sure that the
 # escaped line breaks are interpreted correctly.
-$cincValidationKey = $cincCalidationKey.Replace("`r`n", "`n").Replace("`n", "\n").Trim();
+$cincValidationKey = $cincValidationKey.Replace("`r`n", "`n").Replace("`n", "\n").Trim();
 
 if ($true -eq $Force) {
     Write-Information "Removing existing catlet (if it exists)..." -InformationAction Continue
