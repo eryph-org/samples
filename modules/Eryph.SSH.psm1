@@ -55,6 +55,63 @@ function New-SSHKey {
 
 <#
   .Synopsis
+  Invokes a command on a remote machine via SSH.
+
+  .Description
+  Connects to a remote machine using SSH and executes the
+  given command. SSH will skip the host key check.
+
+  .Parameter Command
+  The command to execute on the remote machine.
+
+  .Parameter Hostname
+  The host to which SSH should connect.
+
+  .Parameter Username
+  The username with which SSH should connect.
+
+  .Parameter KeyFilePath
+  The private key with which SSH should authenticate.
+#>
+function Invoke-SSH {
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $Command,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $Hostname,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $Username,
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string] $KeyFilePath
+    )
+
+    if (-not (Get-Command ssh -ErrorAction SilentlyContinue)) {
+        throw "Could not find ssh. Please install the SSH client."
+    }
+
+    if (-not (Test-Path $KeyFilePath)) {
+        throw "The SSH key file does not exist."
+    }
+
+    # Use legacy argument parsing. This way, the command invocation will behave
+    # the same in old and new versions of Powershell.
+    $PSNativeCommandArgumentPassing = 'Legacy'
+    
+    $result = ssh -q "$Username@$Hostname" `
+        -o 'IdentitiesOnly=yes' `
+        -o 'StrictHostKeyChecking=no' `
+        -i $KeyFilePath `
+        -C $Command
+    
+    return $result
+}
+
+<#
+  .Synopsis
   Installs the SSH client.
 
   .Description
@@ -71,4 +128,5 @@ function Install-SSHClient {
 }
 
 Export-ModuleMember -Function New-SSHKey
+Export-ModuleMember -Function Invoke-SSH
 Export-ModuleMember -Function Install-SSHClient
