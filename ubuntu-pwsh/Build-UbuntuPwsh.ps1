@@ -23,7 +23,7 @@ $sshKeyName = "sshkey"
 $sshKeyPath = Join-Path $sshKeyDirectory $sshKeyName
 
 Install-SSHClient
-$publicKey = New-SSHKey -KeyFilePath $sshKeyPath -Force
+$sshPublicKey = New-SSHKey -KeyFilePath $sshKeyPath -Force
 
 Write-Information "Removing existing catlet (if it exists)..." -InformationAction Continue
 Get-Catlet | Where-Object Name -eq $catletName | Remove-Catlet -Force
@@ -35,7 +35,7 @@ $catlet = New-Catlet `
     -Name $CatletName `
     -Config (Get-Content -Raw -Path $catletConfigPath) `
     -Variables @{
-        sshKey = $publicKey
+        sshPublicKey = $sshPublicKey
         username = $Credentials.GetNetworkCredential().UserName
         password = $credentials.GetNetworkCredential().Password
     } `

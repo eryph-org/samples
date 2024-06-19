@@ -8,7 +8,7 @@ variables:
   - name: password
     required: true
     secret: true
-  - name: sshKey
+  - name: sshPublicKey
     required: true
 
 capabilities:
@@ -28,7 +28,7 @@ fodder:
           lock_passwd: true
           sudo: 'ALL=(ALL) NOPASSWD: ALL'
           ssh_authorized_keys:
-            - '{{ sshkey }}'
+            - '{{ sshPublicKey }}'
 
   - name: install-powershell
     type: cloud-config
