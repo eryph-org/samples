@@ -8,17 +8,31 @@ memory:
   minimum: 1024
   maximum: 4096
 
+capabilities:
+  - name: secure_boot
+    details: ['template:MicrosoftUEFICertificateAuthority']
+
+variables:
+- name: username
+  value: admin
+  required: true
+- name: sshPublicKey
+  required: true
+- name: cincValidationKey
+  secret: true
+  required: true
+
 fodder:
 - name: admin
   type: cloud-config
   secret: true
   content: |
     users:
-    - name: admin
+    - name: '{{ username }}'
       group: admin
-      sudo: ALL=(ALL) NOPASSWD:ALL
+      sudo: 'ALL=(ALL) NOPASSWD:ALL'
       ssh-authorized-keys:
-      - {{sshkey}}
+      - '{{ sshPublicKey }}'
 
 - name: cincclient
   type: cloud-config
@@ -35,7 +49,7 @@ fodder:
         validation_key         "/etc/cinc/validation.pem"
         client_key             "/etc/cinc/client.pem"
         chef_server_url        "https://cinc-server.cinc.internal/organizations/dev"
-        node_name              "{{catletId}}"
+        node_name              "{{ catletId }}"
         json_attribs           "/etc/cinc/firstboot.json"
         file_cache_path        "/var/cache/cinc"
         file_backup_path       "/var/backups/cinc"
@@ -48,8 +62,7 @@ fodder:
       server_url: "https://cinc-server.cinc.internal/organizations/dev"
       validation_name: "validation"
       validation_key: /etc/cinc/validation.pem
-      validation_cert: |
-        {{validation_key}}
+      validation_cert: "{{ cincValidationKey }}"
 
       # Specify a list of initial attributes used by the cookbooks
       initial_attributes:

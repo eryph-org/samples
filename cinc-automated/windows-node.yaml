@@ -8,15 +8,20 @@ memory:
   minimum: 1024
   maximum: 8192
 
+variables:
+- name: cincValidationKey
+  secret: true
+  required: true
+
 fodder:
 - name: admin-windows
   source: gene:dbosoft/starter-food:win-starter
 
-- type: cloud-config
+- name: configure-cinc
+  type: cloud-config
   content: |
     write_files:      
-    - content: |
-        {{validation_key}}
+    - content: "{{ cincValidationKey }}"
       path: C:\cinc\validator.pem
     - path: C:\cinc\client.rb
       content:  |
@@ -27,13 +32,14 @@ fodder:
         validation_key         "c:/cinc/validator.pem"
         client_key             "c:/cinc/client.pem"
         chef_server_url        "https://cinc-server.cinc.internal/organizations/dev"
-        node_name              "{{catletId}}"
+        node_name              "{{ catletId }}"
           
     - content: |
         {  }
       path: C:\cinc\first-boot.json
 
-- type: shellscript
+- name: install-cinc
+  type: shellscript
   file_name: install_cinc.ps1  #this is only required due to a bug in cloudbase-init
   content: |
     #ps1

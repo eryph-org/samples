@@ -1,3 +1,5 @@
+#Requires -Version 5.1
+#Requires -Modules Eryph.ComputeClient
 [CmdletBinding()]
 param (
 
@@ -20,69 +22,62 @@ param (
 push-location $PSScriptRoot
 Set-EryphConfigurationStore -All CurrentDirectory
 
-if(-not (Test-Path .ssh\sshkey)){
-    mkdir .keys -ErrorAction SilentlyContinue | Out-Null
-    ssh-keygen -b 2048 -t rsa -f .ssh\sshkey -q -N ''
-}
+Import-Module -Name "$PSScriptRoot/../modules/Eryph.SSH.psm1"
 
-if(-not (Test-Path .cinc\org-validator.pem)){
+$sshPublicKey = New-SSHKey -KeyFilePath "$PSScriptRoot/.ssh/sshkey"
+
+if (-not (Test-Path .cinc\org-validator.pem)) {
     Write-Error "Cinc organization key not found. Please run script build_cincserver.ps1 first."
     return
 }
 
-$validatorKey = Get-Content .cinc\org-validator.pem
+$cincValidationKey = Get-Content -Raw .cinc\org-validator.pem
+# We escape the line breaks as the validation key is inserted
+# into the YAML cloud-init configuration. Inside the YAML,
+# the string is in double quotes which makes sure that the
+# escaped line breaks are interpreted correctly.
+$cincValidationKey = $cincValidationKey.Replace("`r`n", "`n").Replace("`n", "\n").Trim();
 
-$sshKey = Get-Content .ssh\sshkey.pub
-
-if($true -eq $Force){
-    Write-Information "removing existing catlet, if it exists" -InformationAction Continue
+if ($true -eq $Force) {
+    Write-Information "Removing existing catlet (if it exists)..." -InformationAction Continue
     $catlet = Get-Catlet | Where-Object Name -eq $catletName
     
-    if($catlet){
+    if ($catlet) {
         $id = $catlet.Id
         & knife node delete $id -y 
         $catlet | Remove-Catlet -Force 
     }
 
-}else
-{
+} else {
     $catlet = Get-Catlet | Where-Object Name -eq $catletName
-    if($catlet){
-        Write-Error "catlet $catletName already exists. Use Parameter -Force to recreate it."
+    if ($catlet) {
+        Write-Error "Catlet $catletName already exists. Use Parameter -Force to recreate it."
         return
     }
 }
 
-Write-Information "creating catlet" -InformationAction Continue
+Write-Information "Creating catlet..." -InformationAction Continue
 
-if($os -eq "Linux"){
-$catletConfig = Get-Content ./linux-node.yaml } 
-else{
-$catletConfig = Get-Content ./windows-node.yaml
+if ($os -eq "Linux") {
+    $catletConfig = Get-Content -Raw ./linux-node.yaml } 
+else {
+    $catletConfig = Get-Content -Raw ./windows-node.yaml
 }
 
-$catletConfig = $catletConfig.replace("{{sshkey}}", $sshKey)
-
-# shift lines of validator key so it matches yaml syntax of generated catlet
-$validatorKey | ForEach-Object {
-    if($_ -match "-----BEGIN RSA PRIVATE KEY-----"){
-        $validatorKeyShifted += "$_`n"
-    }else{
-        $validatorKeyShifted += "        $_`n"
-    }
+$variables = @{
+    cincValidationKey = $cincValidationKey
+    sshPublicKey = $sshPublicKey
 }
 
-$validatorKeyShifted = $validatorKeyShifted.TrimStart()
-$catletConfig = $catletConfig.replace("{{validation_key}}", $validatorKeyShifted)
-$catletConfig = $catletConfig.replace("{{environment}}", $environment)
-
-if($parent) {
-    $catlet = $catletConfig | New-Catlet -Name $catletName -Parent $parent | Start-Catlet -Force -ErrorAction Stop
-} else{
-    $catlet = $catletConfig | New-Catlet -Name $catletName | Start-Catlet -Force -ErrorAction Stop
+if ($parent) {
+    $catlet = New-Catlet -Name $catletName -Config $catletConfig -Parent $parent -Variables $variables -SkipVariablesPrompt -ErrorAction Stop
+} else {
+    $catlet = New-Catlet -Name $catletName -Config $catletConfig -Variables $variables -SkipVariablesPrompt -ErrorAction Stop
 }
 
-if($os -eq 'Linux'){
+Start-Catlet -Id $catlet.Id -Force -ErrorAction Stop
+
+if ($os -eq 'Linux') {
     Write-Information "Wait 30 seconds for node bootstrapping..." -InformationAction Continue
     start-sleep -Seconds 30
 } else{
@@ -97,15 +92,12 @@ do {
     $catletId = $catlet.Id
     $nodeInfo = knife node show $catletId 2>&1
 
-    if($os -eq 'Linux'){
-     Start-Sleep -Seconds 10
-} else{
-     Start-Sleep -Seconds 30
-}
-    
-    
+    if ($os -eq 'Linux') {
+        Start-Sleep -Seconds 10
+    } else{
+        Start-Sleep -Seconds 30
+    }
 } until ($nodeInfo -match 'FQDN')
-
 
 Write-Information "Catlet $($catlet.Name) is ready." -InformationAction Continue
 $nodeInfo
