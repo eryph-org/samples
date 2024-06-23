@@ -1,0 +1,5 @@
+name: tutorial-1
+parent: dbosoft/ubuntu-22.04/starter
+
+memory:
+  startup: 1024
