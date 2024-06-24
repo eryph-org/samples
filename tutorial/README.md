@@ -192,6 +192,7 @@ Each catlet is assigned and unique within a project. If you do not specify other
 A project provides isolation between catlets. This means that each catlet can only "see" catlets in the same project. Projects could also have different members, so you can also separate who has access to a project.
 
 Here are some examples of how this can be used:
+- Build a testing infrastructure locally from a Git repository.
 - You have set up a central test machine in your local IT office and would like to provide isolated test environments to each team member.
 - You would like to run different software versions on the same  - simulated - infrastructure using same  hostnames and ip addresses as in production.
 - You would like to isolate machines on a DMZ host. 
