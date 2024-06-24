@@ -234,4 +234,4 @@ This is where provider network configuration comes in. You have the option of co
 You can even disable overlay networking completely and use the default Hyper-V networking mode if you don't need isolation or network configuration.
 
 > **Remarks:**  
-> Cross project networking is currently not supported, but will be added in future. However you can allow communication between projects always on provider network side.
+> Cross project networking is currently not supported, but will be added in future. However you can allow communication between projects always on provider network. 
