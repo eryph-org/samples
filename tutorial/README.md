@@ -92,8 +92,8 @@ Install-SSHClient
 ```
 
 Next, we will look up the catlet IP.   
-A catlet gets an internal IP that's accessible within its project. If no project is specified, it uses the default. So catlet project IPs will be like 10.0.0.11.
-To access a catlet from the host, each catlet has a NAT IP.  
+A catlet gets an internal IP that's accessible within its project. If no project is specified, it uses the default. So catlet internal Ip will be something like 10.0.0.11.
+To access a catlet from the host, each catlet also has a NAT IP.  
 
 You can lookup both information with the `Get-CatletIp` cmdlet: 
 
