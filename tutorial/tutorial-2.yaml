@@ -4,6 +4,7 @@ parent: dbosoft/ubuntu-22.04/starter
 memory:
   startup: 1024
 
+# added apache fodder:
 fodder: 
  - name: apache
    content: |

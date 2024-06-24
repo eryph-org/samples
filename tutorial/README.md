@@ -10,9 +10,11 @@ This folder contains some tutorials to learn the basics of catlet configuration.
 
 ## Tutorial 0: Basics
 
-You can create a catlet quickly from a parent with New-Catlet command:
+You can create a new catlet quickly from a parent with `New-Catlet` command:
 
 `New-Catlet -Parent <Org>/<Geneset>/<Tag>`
+
+Catlets are stored in **genesets** on the eryph **genepool**. You can understand the `<Org>/<Geneset>/<Tag>` syntax as the address of each catlet:
 
 - Org: Name of organization on genepool, e.g. dbosoft
 - Geneset: Name of geneset
@@ -30,8 +32,9 @@ or
 New-Catlet -Parent dbosoft/ubuntu-22.04
 ```
 for latest geneset. 
+The eryph genepool contains artifacts that can be shared within eryph - these artifacts are called genes. Genes of same purpose can be grouped in a geneset. A Geneset tag identifies a single gene in the geneset.
 
-The catlet parent will be automatically download from the eryph genepool if not already available local. It may require some GB (for Windows parents). So don't run this on your mobile device!
+The catlet parent will be automatically download from the eryph genepool if not already available local. It may require some GB (for example for a Window parent). So don't run this on your mobile device!
 
 You can see your catlet now in Hyper-V Manager and can start it like any other VM, or you can use the start-Catlet cmdlet to run it:
 
@@ -163,7 +166,7 @@ With variables, you can declare variables within catlets and fodder genes that h
 So far we have used always the default password `admin` for the user. 
 In tutorial-3.yaml we now declare a variable for the password, so you have to provide it when creating the catlet:
 
- ```
+ ``` 
 gc ./tutorial-3.yaml | New-Catlet | Start-Catlet -Force
 
 Catlet variables

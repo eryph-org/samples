@@ -1,5 +1,7 @@
-name: tutorial-3
+name: tutorial-4
 parent: dbosoft/ubuntu-22.04/starter
+
+## added project name:
 project: tutorial
 
 memory:
