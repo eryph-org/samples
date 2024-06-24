@@ -15,7 +15,7 @@ You can create a new catlet quickly from a parent with the `New-Catlet` command:
 
 `New-Catlet -Parent <Org>/<Geneset>/<Tag>`
 
-Catlets are stored in **genesets** on the eryph **genepool** (something like the Docker Hub). The `<Org>/<Geneset>/<Tag>` syntax is the address of each catlet. 
+Catlets are stored in **genesets** on the eryph **genepool** (something like the Docker Hub). The `<Org>/<Geneset>/<Tag>` syntax is the address of a geneset. 
 
 - Org: Name of organization on genepool, e.g. dbosoft
 - Geneset: Name of geneset
