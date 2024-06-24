@@ -1,0 +1,27 @@
+name: tutorial-2
+parent: dbosoft/ubuntu-22.04/starter
+
+memory:
+  startup: 1024
+
+# added apache fodder:
+fodder: 
+ - name: apache
+   content: |
+    packages:
+    - apache2
+
+    write_files:
+      - content: |
+          <VirtualHost *:80>
+              ServerAdmin webmaster@example.com
+              ServerName example.com
+              ServerAlias www.example.com
+              DocumentRoot /var/www/html/example.com
+              ErrorLog ${APACHE_LOG_DIR}/error.log
+              CustomLog ${APACHE_LOG_DIR}/access.log combined
+          </VirtualHost>
+        path: /etc/apache2/sites-available/example.com.conf
+    runcmd:
+      - a2ensite example.com.conf
+      - systemctl reload apache2

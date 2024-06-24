@@ -1,0 +1,15 @@
+version: 1.0
+project: tutorial
+networks:
+- name: default
+  address: 172.16.0.0/20
+  subnets:
+  - name: default
+    ip_pools:
+    - name: default
+      first_ip: 172.16.0.10
+      last_ip: 172.16.0.100
+    dns_servers:
+    - 9.9.9.9
+    - 8.8.8.8
+    mtu: 1400
