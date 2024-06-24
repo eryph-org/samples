@@ -4,23 +4,24 @@ This folder contains some tutorials to learn the basics of catlet configuration.
 
 ## Getting Started
 
-1. Clone this repository if you have not already done so.
-2. Install eryph!
-3. open tutorial folder in a powershell prompt
+1. Clone this repository.
+2. Install eryph!  
+(If you're still on the waitlist, you can't do this, sorry!)
+3. Open the tutorial folder in a PowerShell prompt.
 
 ## Tutorial 0: Basics
 
-You can create a new catlet quickly from a parent with `New-Catlet` command:
+You can create a new catlet quickly from a parent with the `New-Catlet` command:
 
 `New-Catlet -Parent <Org>/<Geneset>/<Tag>`
 
-Catlets are stored in **genesets** on the eryph **genepool**. You can understand the `<Org>/<Geneset>/<Tag>` syntax as the address of each catlet:
+Catlets are stored in **genesets** on the eryph **genepool**. The `<Org>/<Geneset>/<Tag>` syntax is the address of each catlet. 
 
 - Org: Name of organization on genepool, e.g. dbosoft
 - Geneset: Name of geneset
 - a geneset tag, optional (default is **latest**)
 
-e.g.
+Example:
 
 ``` pwsh
 New-Catlet -Parent dbosoft/ubuntu-22.04/starter
@@ -31,10 +32,10 @@ or
 ``` pwsh
 New-Catlet -Parent dbosoft/ubuntu-22.04
 ```
-for latest geneset. 
-The eryph genepool contains artifacts that can be shared within eryph - these artifacts are called genes. Genes of same purpose can be grouped in a geneset. A Geneset tag identifies a single gene in the geneset.
+for latest geneset.   
+The eryph genepool contains artifacts that can be shared within eryph - these artifacts are called genes. Genes of same purpose can be grouped in a geneset.
 
-The catlet parent will be automatically download from the eryph genepool if not already available local. It may require some GB (for example for a Window parent). So don't run this on your mobile device!
+The catlet parent genes will be downloaded from the eryph genepool if it isn't already available locally. It may take up to GB (for example for a Windows parent). Don't run this on your mobile device!
 
 You can see your catlet now in Hyper-V Manager and can start it like any other VM, or you can use the start-Catlet cmdlet to run it:
 
@@ -43,7 +44,7 @@ You can see your catlet now in Hyper-V Manager and can start it like any other V
 New-Catlet -Parent dbosoft/ubuntu-22.04/starter | Start-Catlet -Force
 ```
 
-When the catlet is started, it automatically configures itself by eating all food you provided. In case of the starter catlet parent the parent already contains a default user **admin** with password **admin**. 
+When the catlet is started, it automatically configures itself by eating all food you provided. In case of the starter catlet the configuration already contains fodder that creates a user **admin** with password **admin**. 
 
 ### Other useful cmdlets: 
 
@@ -52,7 +53,7 @@ When the catlet is started, it automatically configures itself by eating all foo
 - **Remove-Catlet**:  
   To remove a catlet by its id
 
-To remove all catlets you have create up to now simple use a powershell pipeline:
+To remove all catlets simple use a powershell pipeline:
 
 ``` pswh
 Get-Catlet | Remove-Catlet -Force
@@ -60,7 +61,8 @@ Get-Catlet | Remove-Catlet -Force
 
 ## Tutorial 1: Catlet specs
 
-Instead of writing always everything on the command line you should write more complex catlet specs in files. 
+Instead of writing always everything on the command line you should write more complex catlet specs in files.  
+
 A simple example:
 
 ``` yaml
@@ -76,7 +78,7 @@ Such a spec file can then be passed to New-Catlet via powershell pipeline:
 gc ./catlet.yaml | New-Catlet  
 ```
 
-The file `tutorial-1.yaml` shows you how to set simple settings like name, parent and memory size. Running following command to create and start the catlet:
+The file `tutorial-1.yaml` shows you how to set simple settings like name, parent and memory size. Run following command to create and start the catlet:
 
 ``` pwsh
 gc ./tutorial-1.yaml | New-Catlet | Start-Catlet -Force
@@ -89,9 +91,11 @@ Import-Module -Name "../modules/Eryph.SSH.psm1"
 Install-SSHClient
 ```
 
-Now lets first look up the catlet ip.  
-A catlet automatically receives a internal IP that is accessable within the network of its project. If no project is specified, it will use the default project. So catlets project IP will most probably will be something like 10.0.0.11. 
-To access the catlet from the host (your machine) each catlet also has a NAT IP, that is accessable from the host. You can lookup both information with the `Get-CatletIp` cmdlet: 
+Next, we will look up the catlet IP.   
+A catlet gets an internal IP that's accessible within its project. If no project is specified, it uses the default. So catlet project IPs will be like 10.0.0.11.
+To access a catlet from the host, each catlet has a NAT IP.  
+
+You can lookup both information with the `Get-CatletIp` cmdlet: 
 
 ``` pwsh
 Get-CatletIp -Internal # for internal IP
@@ -111,9 +115,9 @@ It's time to feed our catlets!
 
 With fodder you specify how a catlet configures itself. 
 
-Have a look at tutorial-2.yaml.   
+Have a look at `tutorial-2.yaml`.   
 You can see a section fodder containing some config to set up a apache server.  
-If you already have automatically set up machines in the cloud this may look familiar to you. Exactly - fooder content will be injected as cloud-init configuration into your catlet!
+If you already have automatically set up machines in the cloud this may look familiar to you. Exactly - fooder content will be injected as [cloud-init](https://cloud-init.io/) configuration into your catlet!
 
 So let`s create a apache server: 
 
@@ -141,6 +145,7 @@ fodder:
 ```
 
 Like catlets fodder can also be shared on the genepool. Thats exactly what the catlet on the starter tag does.  
+
 See how the geneset `dbosoft/ubuntu-22.04/starter` is declared: 
 
  ``` yaml
@@ -148,6 +153,7 @@ parent: dbosoft/ubuntu-22.04/latest
 fodder:
  - source: gene:dbosoft/starter-food:linux-starter
 ```
+
 
 >**For experts**:  
 > Actually dbosoft/ubuntu-22.04/starter is a ref to dbosoft/ubuntu-22.04/starter-[version], but let`s skip that detail for now.
@@ -164,7 +170,7 @@ However, there are situations where you may need some variability in the final c
 With variables, you can declare variables within catlets and fodder genes that have to be provided when the catlet is created.
 
 So far we have used always the default password `admin` for the user. 
-In tutorial-3.yaml we now declare a variable for the password, so you have to provide it when creating the catlet:
+In `tutorial-3.yaml` we now declare a variable for the password, so you have to provide it when creating the catlet:
 
  ``` 
 gc ./tutorial-3.yaml | New-Catlet | Start-Catlet -Force
@@ -176,7 +182,8 @@ will fail if you do not specify them.
 [String] password:
 ```
 
-Variables can be used only in fodder but can be declared both in catlets and fodder genes. If a fodder gene is used with required variables a catlet has either to provide a value for then or to declare its own input variables to provide them.
+Variables can be used only in fodder but can be declared both in catlets and fodder genes.  
+If a fodder gene is used with required variables a catlet has either to provide a value for then or to declare its own input variables to provide them.
 
 
 ## Tutorial 4: Projects and Networks

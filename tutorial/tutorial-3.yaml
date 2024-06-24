@@ -1,5 +1,5 @@
 name: tutorial-3
-parent: dbosoft/ubuntu-22.04/latest  #changed tag from starter to latest
+parent: dbosoft/ubuntu-22.04/starter  #changed tag from starter to latest
 
 memory:
   startup: 1024
