@@ -106,4 +106,16 @@ $configTemplate = $configTemplate.replace("{{cinc_ip}}", $ip)
 $configTemplate | set-Content .cinc/config.rb
 
 Write-Information "cinc server has been setup." -InformationAction Continue
-Write-Information "The following command shoud now work: knife user list" -InformationAction Continue
+
+Write-Information "Trying knife command 'knife user list' ..." -InformationAction Continue
+
+$userList = knife user list
+if($userList -match "cinc-user"){
+    Write-Information "knife works!" -InformationAction Continue
+}else{
+    Write-Error "knife does not work. Something went wrong. Try executing the script again."
+    return
+}
+
+Write-Information "cinc server is ready to use." -InformationAction Continue
+Write-Information "To create a node run script Build-Node.ps1" -InformationAction Continue
