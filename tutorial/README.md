@@ -41,7 +41,7 @@ You can see your catlet now in Hyper-V Manager and can start it like any other V
 
 
 ``` pwsh
-New-Catlet -Parent dbosoft/ubuntu-22.04/starter | Start-Catlet -Force
+Get-Catlet  | Start-Catlet -Force
 ```
 
 When the catlet is started, it automatically configures itself by eating all food you provided. In case of the starter catlet the configuration already contains fodder that creates a user **admin** with password **admin**. 
