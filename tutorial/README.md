@@ -174,7 +174,10 @@ In `tutorial-3.yaml` we now declare a variable for the password, so you have to 
 
  ``` 
 gc ./tutorial-3.yaml | New-Catlet | Start-Catlet -Force
+```
 
+You will then see a prompt like this:
+```
 Catlet variables
 Would you like to provide variable values interactively? Some required variables are missing values. The deployment
 will fail if you do not specify them.
