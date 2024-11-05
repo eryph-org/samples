@@ -19,7 +19,7 @@ fodder:
 
 - name: configure-cinc
   type: cloud-config
-  content: |
+  content: 
     write_files:      
     - content: "{{ cincValidationKey }}"
       path: C:\cinc\validator.pem
