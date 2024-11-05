@@ -215,7 +215,7 @@ You can download the default set up network of a project with the Get-VNetwork c
 Get-VNetwork -ProjectName tutorial -config
 
 # to import the project network we have prepared for you:
-gc ./tutorial-network.yaml | Set-VNetwork
+gc ./tutorial-network.yaml | Set-VNetwork -ProjectName tutorial
 
 ```
 
