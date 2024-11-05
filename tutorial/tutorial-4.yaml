@@ -16,9 +16,9 @@ fodder:
  - source: gene:dbosoft/starter-food:linux-starter
    variables: 
    - name: password
-     value: {{ password }}
+     value: "{{ password }}"
  - name: apache
-   content: |
+   content:
     packages:
     - apache2
 
