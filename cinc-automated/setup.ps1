@@ -67,7 +67,7 @@ if (-not $role) {
 }
 
 
-Get-Content network.yaml | Set-VNetwork
+Get-Content network.yaml | Set-VNetwork -ProjectName cinc
 
 Pop-Location
 
