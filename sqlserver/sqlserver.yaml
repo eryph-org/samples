@@ -18,7 +18,7 @@ variables:
 fodder:    
  - name: admin-windows
    type: cloud-config
-   content: |
+   content: 
     users:
       - name: '{{ username }}'
         groups: [ "Administrators" ]
