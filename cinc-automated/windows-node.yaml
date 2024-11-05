@@ -40,7 +40,7 @@ fodder:
 
 - name: install-cinc
   type: shellscript
-  file_name: install_cinc.ps1  #this is only required due to a bug in cloudbase-init
+  filename: install_cinc.ps1  #this is only required due to a bug in cloudbase-init
   content: |
     #ps1
 
