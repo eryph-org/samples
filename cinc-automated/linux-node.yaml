@@ -26,7 +26,7 @@ fodder:
 - name: admin
   type: cloud-config
   secret: true
-  content: |
+  content: 
     users:
     - name: '{{ username }}'
       group: admin
@@ -36,7 +36,7 @@ fodder:
 
 - name: cincclient
   type: cloud-config
-  content: |
+  content: 
     # chef module cannot configure client for cinc
     # do it manully
     write_files:      
