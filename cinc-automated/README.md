@@ -11,8 +11,32 @@ registered in the chef server.
 2. Execute script `setup.ps1` in a **elevated** command prompt. 
 
 The setup script will install cinc workstation on your local machine. Main command of cinc workstation is the `knife` command. 
+When workstation is installed a restart of the powershell (not the computer) may be required. Afterwards - when executed again the setup script will automatically install a cinc server.
 
-Every Chef Infra installation needs a Chef Repository. This is the place where cookbooks, policyfiles, config files and other artifacts for managing systems with Chef Infra will live. We strongly recommend storing this repository in a version control system such as Git and treating it like source code.
+You can now use the script Build-Node.ps1 to create ubuntu or windows nodes that are registered automatically in the cinc server. 
+
+Example: 
+
+``` ps
+.\Build-Node.ps1 -CatletName node1 -Os Linux
+```
+
+## Cinc project
+
+The example setup contains an eryph project called cinc. A dedicated client is created automatically so that you can access the project without administrative privileges. 
+The project includes a network setup to separate the cinc server and clients on its own network with a single IP 10.0.0.130 so that it always gets the same IP. 
+However, the nodes will use the eryph managed dns name of the cinc server (https://cinc-server.cinc.internal). 
+
+## Nodes
+
+The created nodes will be build from the linux-node.yaml or windows-node.yaml catlet spec file. Both contains fodder to configure the cinc client and for registration in the cinc server.
+The created nodes cannot be accessed via SSH or winrm via the knife command from the host as the hostnames are only known internally in the catlet network. 
+To find the current IP for remote access to catlets, use the Get-CatletIp command.
+
+# Cinc and Chef Repository data
+Every Chef Infra installation needs a Chef Repository. This is the place where cookbooks, policyfiles, config files and other artifacts for managing systems with Chef Infra will live. 
+More information on the structure of a chef (and cinc) repository can be found here: https://docs.chef.io/chef_repo/
+The sample repository just contains the default example cookbook.
 
 ## Repository Directories
 

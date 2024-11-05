@@ -7,7 +7,7 @@ memory:
 # added apache fodder:
 fodder: 
  - name: apache
-   content: |
+   content:
     packages:
     - apache2
 

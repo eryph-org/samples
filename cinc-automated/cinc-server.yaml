@@ -23,7 +23,7 @@ variables:
 fodder:
 - name: admin
   type: cloud-config
-  content: |
+  content: 
     users:
     - name: '{{ username }}'
       group: admin
@@ -33,6 +33,6 @@ fodder:
 
 - name: cincserver
   type: cloud-config
-  content: |
+  content: 
     runcmd:
       - touch /installed
