@@ -5,9 +5,9 @@ This folder contains some tutorials to learn the basics of catlet configuration.
 ## Getting Started
 
 1. Clone this repository.
-2. Install eryph!  
+2. Install eryph!  See https://github.com/eryph-org/eryph/blob/main/src/apps/src/Eryph-zero/README.md  
 (If you're still on the waitlist, you can't do this, sorry!)
-3. Open the tutorial folder in a PowerShell prompt.
+3. Open the tutorial folder in a **elevated** PowerShell prompt (as Administrator).
 
 ## Tutorial 0: Basics
 
