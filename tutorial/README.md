@@ -46,7 +46,7 @@ Get-Catlet  | Start-Catlet -Force
 
 When the catlet is started, it automatically configures itself by eating all food you provided. In case of the starter catlet the configuration already contains fodder that creates a user **admin** with password **admin**. 
 
-### Other useful cmdlets: 
+### Other useful cmdlets
 
 - **Get-Catlet**:  
   Shows a list or a single catlet if you add the catlet id. Catlets are always identifed by an id. The name of a catlet is only unique within a project (we will come later to projects).
@@ -57,6 +57,20 @@ To remove all catlets simple use a powershell pipeline:
 
 ``` pswh
 Get-Catlet | Remove-Catlet -Force
+```
+
+### Catlets must be unique within a project
+Note that we did not specify a name for the catlet. In this case, the default name "catlet" will be used. If you create another catlet without a name, you will get a name conflict error.  
+Within a project, all catlets must have a unique name.   
+To avoid this error, either provide a name for newly created catlets or remove the previously created catlet: 
+
+``` pwsh
+
+# use name for new catlets
+New-Catlet -Name newcatlet -Parent dbosoft/ubuntu-22.04
+
+#or remove the other catlet by name:
+Get-Catlet | where Name -eq catlet | Remove-Catlet -Force
 ```
 
 ## Tutorial 1: Catlet specs
