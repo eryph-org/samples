@@ -69,8 +69,8 @@ To avoid this error, either provide a name for newly created catlets or remove t
 # use name for new catlets
 New-Catlet -Name newcatlet -Parent dbosoft/ubuntu-22.04
 
-#or remove the other catlet by name:
-Get-Catlet | where Name -eq catlet | Remove-Catlet -Force
+# or remove the other catlet by name:
+Get-Catlet | where Name -eq "catlet" | Remove-Catlet -Force
 ```
 
 ## Tutorial 1: Catlet specs
