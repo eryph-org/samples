@@ -250,5 +250,7 @@ You might be wondering how you can access catlets from another host even if it's
 This is where provider network configuration comes in. You have the option of configuring eryph to use your existing network for communication with the catlets from the host or other machines instead of using the default NAT overlay network mode.  
 You can even disable overlay networking completely and use the default Hyper-V networking mode if you don't need isolation or network configuration.
 
+You can find more information about this in the docs - [Advanced Networking](https://www.eryph.io/docs/advanced-networking).
+
 > **Remarks:**  
 > Cross project networking is currently not supported, but will be added in future. However you can allow communication between projects always on provider network. 
