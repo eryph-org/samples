@@ -1,7 +1,7 @@
 This repo contains samples and tutorials for breeding catlets with eryph -> https://www.eryph.io
 
 Main development project: http://www.github.com/eryph-org/eryph  
-Community: https://www.linkedin.com/showcase/eryph
+Community: https://github.com/orgs/eryph-org/discussions
 
 ----
 
