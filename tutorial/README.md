@@ -35,7 +35,7 @@ New-Catlet -Parent dbosoft/ubuntu-22.04
 for latest geneset.   
 The eryph genepool contains artifacts that can be shared within eryph - these artifacts are called genes. Genes of same purpose can be grouped in a geneset.
 
-The catlet parent genes will be downloaded from the eryph genepool if it isn't already available locally. It may take up to GB (for example for a Windows parent). Don't run this on your mobile device!
+The catlet parent genes will be downloaded from the eryph genepool if it isn't already available locally. It may take up to GB (for example for a Windows parent). If you have a limited amount of data on your Internet connection, do not do it without thinking about it ;-)
 
 You can see your catlet now in Hyper-V Manager and can start it like any other VM, or you can use the start-Catlet cmdlet to run it:
 
