@@ -61,8 +61,8 @@ Get-Catlet | Remove-Catlet -Force
 
 ### Catlets must be unique within a project
 Note that we did not specify a name for the catlet. In this case, the default name "catlet" will be used. If you create another catlet without a name, you will get a name conflict error.  
-Within a project, all catlets must have a unique name.   
-To avoid this error, either provide a name for newly created catlets or remove the previously created catlet: 
+Within a project, all catlets must have a unique name. Since we did not specify the project, the default name "default" will be used.
+To avoid this error, either specify a name for newly created catlets or remove the previously created catlet: 
 
 ``` pwsh
 
