@@ -3,15 +3,8 @@ parent: dbosoft/ubuntu-22.04/latest
 
 project: cinc
 
-capabilities:
-  - name: secure_boot
-    details: ['template:MicrosoftUEFICertificateAuthority']
-
 memory: 
   startup: 4096
-
-networks: 
-- name: server
 
 variables:
 - name: username
@@ -26,7 +19,7 @@ fodder:
   content: 
     users:
     - name: '{{ username }}'
-      group: admin
+      groups: adm
       sudo: 'ALL=(ALL) NOPASSWD:ALL'
       ssh-authorized-keys:
       - '{{ sshPublicKey }}'

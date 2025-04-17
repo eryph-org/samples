@@ -8,10 +8,6 @@ memory:
   minimum: 1024
   maximum: 4096
 
-capabilities:
-  - name: secure_boot
-    details: ['template:MicrosoftUEFICertificateAuthority']
-
 variables:
 - name: username
   value: admin
@@ -29,7 +25,7 @@ fodder:
   content: 
     users:
     - name: '{{ username }}'
-      group: admin
+      groups: adm
       sudo: 'ALL=(ALL) NOPASSWD:ALL'
       ssh-authorized-keys:
       - '{{ sshPublicKey }}'

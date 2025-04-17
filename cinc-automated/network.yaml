@@ -14,16 +14,3 @@ networks:
     - 8.8.8.8
     mtu: 1400
     dns_domain: cinc.internal
-- name: server
-  address: 10.0.0.128/30
-  subnets:
-  - name: default
-    ip_pools:
-    - name: default
-      first_ip: 10.0.0.130
-      last_ip: 10.0.0.130
-    dns_servers:
-    - 9.9.9.9
-    - 8.8.8.8
-    mtu: 1400
-    dns_domain: cinc.internal    

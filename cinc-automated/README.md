@@ -24,8 +24,6 @@ Example:
 ## Cinc project
 
 The example setup contains an eryph project called cinc. A dedicated client is created automatically so that you can access the project without administrative privileges. 
-The project includes a network setup to separate the cinc server and clients on its own network with a single IP 10.0.0.130 so that it always gets the same IP. 
-However, the nodes will use the eryph managed dns name of the cinc server (https://cinc-server.cinc.internal). 
 
 ## Nodes
 
