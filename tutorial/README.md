@@ -2,7 +2,15 @@
 
 This folder contains some tutorials to learn the basics of catlet configuration.
 
+**Update**:  
+You can also use the [eryph App](https://www.eryph.io/docs/eryph-app) for this tutorial instead of the command line. 
+Just use the files from the tutorial in the catlet YAML editor of the eryph App.
+
 ## Getting Started
+
+Use the eryph app, go to Catlets, New Catlet and copy the Catlet YAML files from this tutorial into the YAML editor.
+
+**or**
 
 1. Clone this repository.
 2. Install eryph!  See https://github.com/eryph-org/eryph/blob/main/src/apps/src/Eryph-zero/README.md  
