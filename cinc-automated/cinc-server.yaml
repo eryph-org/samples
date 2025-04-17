@@ -6,9 +6,6 @@ project: cinc
 memory: 
   startup: 4096
 
-networks: 
-- name: server
-
 variables:
 - name: username
   value: admin
