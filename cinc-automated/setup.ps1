@@ -1,5 +1,5 @@
 #Requires -Version 5.1
-#Requires -Modules Eryph.IdentityClient
+#Requires -Modules Eryph.IdentityClient, Eryph.ComputeClient
 #Requires -RunAsAdministrator
 
 $ErrorActionPreference = "Stop"
@@ -55,8 +55,9 @@ if (-not $project) {
     Write-Information "project 'cinc' found" -InformationAction Continue
 }
 
-$role = Get-EryphProjectMemberRole -ProjectName cinc  -Credentials $sysCred `
-    | Where-Object ProjectId -eq ($project.Id) `
+
+$role = Get-EryphProjectMemberRole -ProjectName "cinc"  -Credentials $sysCred `
+    | Where-Object { $_.Project.Id -eq ($project.Id) }`
     | Where-Object MemberId -eq $clientId
 
 if (-not $role) {
@@ -67,7 +68,7 @@ if (-not $role) {
 }
 
 
-Get-Content network.yaml | Set-VNetwork
+Get-Content network.yaml | Set-VNetwork -ProjectName cinc
 
 Pop-Location
 

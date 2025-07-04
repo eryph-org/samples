@@ -18,7 +18,7 @@ capabilities:
 fodder:
   - name: add-user
     type: cloud-config
-    content: |
+    content:
       users:
         - name: '{{ username }}'
           plain_text_passwd: '{{ password }}'
@@ -31,7 +31,7 @@ fodder:
 
   - name: install-powershell
     type: cloud-config
-    content: |
+    content:
       apt:
         preserve_sources_list: true
         sources:
@@ -49,7 +49,8 @@ fodder:
       echo 'Subsystem powershell /usr/bin/pwsh -sshs' >> /etc/ssh/sshd_config.d/99-powershell.conf
       service ssh restart
 
-  - source: gene:dbosoft/cm-tools/0.4.1:hello-world-linux
-    variables:
-      - name: name
-        value: "{{ username }}"
+  - name: add-hello-world
+    type: shellscript
+    content: |
+      #!/bin/bash
+      echo 'Hello world!' >> hello-world.txt

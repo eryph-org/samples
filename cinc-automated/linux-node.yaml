@@ -8,10 +8,6 @@ memory:
   minimum: 1024
   maximum: 4096
 
-capabilities:
-  - name: secure_boot
-    details: ['template:MicrosoftUEFICertificateAuthority']
-
 variables:
 - name: username
   value: admin
@@ -26,17 +22,17 @@ fodder:
 - name: admin
   type: cloud-config
   secret: true
-  content: |
+  content: 
     users:
     - name: '{{ username }}'
-      group: admin
+      groups: adm
       sudo: 'ALL=(ALL) NOPASSWD:ALL'
       ssh-authorized-keys:
       - '{{ sshPublicKey }}'
 
 - name: cincclient
   type: cloud-config
-  content: |
+  content: 
     # chef module cannot configure client for cinc
     # do it manully
     write_files:      

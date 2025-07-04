@@ -2,12 +2,20 @@
 
 This folder contains some tutorials to learn the basics of catlet configuration.
 
+**Update**:  
+You can also use the [eryph App](https://www.eryph.io/docs/eryph-app) for this tutorial instead of the command line. 
+Just use the files from the tutorial in the catlet YAML editor of the eryph App.
+
 ## Getting Started
 
+Use the eryph app, go to Catlets, New Catlet and copy the Catlet YAML files from this tutorial into the YAML editor.
+
+**or**
+
 1. Clone this repository.
-2. Install eryph!  
+2. Install eryph!  See https://github.com/eryph-org/eryph/blob/main/src/apps/src/Eryph-zero/README.md  
 (If you're still on the waitlist, you can't do this, sorry!)
-3. Open the tutorial folder in a PowerShell prompt.
+3. Open the tutorial folder in a **elevated** PowerShell prompt (as Administrator).
 
 ## Tutorial 0: Basics
 
@@ -35,18 +43,18 @@ New-Catlet -Parent dbosoft/ubuntu-22.04
 for latest geneset.   
 The eryph genepool contains artifacts that can be shared within eryph - these artifacts are called genes. Genes of same purpose can be grouped in a geneset.
 
-The catlet parent genes will be downloaded from the eryph genepool if it isn't already available locally. It may take up to GB (for example for a Windows parent). Don't run this on your mobile device!
+The catlet parent genes will be downloaded from the eryph genepool if it isn't already available locally. It may take up to GB (for example for a Windows parent). If you have a limited amount of data on your Internet connection, do not do it without thinking about it ;-)
 
 You can see your catlet now in Hyper-V Manager and can start it like any other VM, or you can use the start-Catlet cmdlet to run it:
 
 
 ``` pwsh
-New-Catlet -Parent dbosoft/ubuntu-22.04/starter | Start-Catlet -Force
+Get-Catlet  | Start-Catlet -Force
 ```
 
 When the catlet is started, it automatically configures itself by eating all food you provided. In case of the starter catlet the configuration already contains fodder that creates a user **admin** with password **admin**. 
 
-### Other useful cmdlets: 
+### Other useful cmdlets
 
 - **Get-Catlet**:  
   Shows a list or a single catlet if you add the catlet id. Catlets are always identifed by an id. The name of a catlet is only unique within a project (we will come later to projects).
@@ -57,6 +65,20 @@ To remove all catlets simple use a powershell pipeline:
 
 ``` pswh
 Get-Catlet | Remove-Catlet -Force
+```
+
+### Catlets must be unique within a project
+Note that we did not specify a name for the catlet. In this case, the default name "catlet" will be used. If you create another catlet without a name, you will get a name conflict error.  
+Within a project, all catlets must have a unique name. Since we did not specify the project either, the default project "default" is used.
+To avoid this error, either specify a name for newly created catlets or remove the previously created catlet: 
+
+``` pwsh
+
+# use name for new catlets
+New-Catlet -Name newcatlet -Parent dbosoft/ubuntu-22.04
+
+# or remove the other catlet by name:
+Get-Catlet | where Name -eq "catlet" | Remove-Catlet -Force
 ```
 
 ## Tutorial 1: Catlet specs
@@ -174,7 +196,10 @@ In `tutorial-3.yaml` we now declare a variable for the password, so you have to 
 
  ``` 
 gc ./tutorial-3.yaml | New-Catlet | Start-Catlet -Force
+```
 
+You will then see a prompt like this:
+```
 Catlet variables
 Would you like to provide variable values interactively? Some required variables are missing values. The deployment
 will fail if you do not specify them.
@@ -209,10 +234,10 @@ You can download the default set up network of a project with the Get-VNetwork c
 
 
 ``` pwsh
-Get-VNetwork -ProjectName tutorial
+Get-VNetwork -ProjectName tutorial -config
 
 # to import the project network we have prepared for you:
-gc ./tutorial-network.yaml | Set-VNetwork
+gc ./tutorial-network.yaml | Set-VNetwork -ProjectName tutorial
 
 ```
 
@@ -232,6 +257,8 @@ You might be wondering how you can access catlets from another host even if it's
 
 This is where provider network configuration comes in. You have the option of configuring eryph to use your existing network for communication with the catlets from the host or other machines instead of using the default NAT overlay network mode.  
 You can even disable overlay networking completely and use the default Hyper-V networking mode if you don't need isolation or network configuration.
+
+You can find more information about this in the docs - [Advanced Networking](https://www.eryph.io/docs/advanced-networking).
 
 > **Remarks:**  
 > Cross project networking is currently not supported, but will be added in future. However you can allow communication between projects always on provider network. 
