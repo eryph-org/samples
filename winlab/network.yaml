@@ -1,0 +1,15 @@
+version: 1.0
+project: winlab
+networks:
+- name: default
+  address: 10.0.0.0/20
+  subnets:
+  - name: default
+    ip_pools:
+    - name: default
+      first_ip: 10.0.0.100
+      last_ip: 10.0.0.240
+    dns_servers:
+{{ dns_servers }}
+    mtu: 1400
+    dns_domain: winlab.local

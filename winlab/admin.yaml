@@ -1,0 +1,56 @@
+name: dc1
+parent: dbosoft/winsrv2022-standard
+
+memory: 
+ startup: 2048
+ minimum: 1024
+ maximum: 4096
+cpu: 2
+
+
+variables:
+- name: domain
+  value: winlab.local
+  required: true
+- name: domain_admin
+  required: true
+- name: domain_admin_password
+  secret: true
+  required: true
+
+fodder:
+- source: gene:dbosoft/starter-food:win-starter
+  name: admin-windows
+  variables:
+  - name: AdminUsername
+    value: '{{ domain_admin }}'
+  - name: AdminPassword
+    value: '{{ domain_admin_password }}'
+- source: gene:dbosoft/starter-food:win-starter
+  name: remote-desktop    
+- source: gene:dbosoft/winconfig:join-domain
+  variables:
+  - name: domain_name
+    value: '{{ domain }}'
+  - name: domain_admin
+    value: '{{ domain_admin }}'
+  - name: domain_admin_password
+    value: '{{ domain_admin_password }}'  
+- name: member
+  type: shellscript
+  filename: member_settings.ps1
+  content: |
+    # allow winrm
+    Enable-PSRemoting -Force
+    # allow ping 
+    New-NetFirewallRule -DisplayName "Allow ICMPv4-In" -Direction Inbound -Protocol ICMPv4 -IcmpType 8 -Action Allow
+- name: admin
+  type: shellscript
+  filename: admin_settings.ps1
+  content: |
+    # install domain admin tools
+    Install-WindowsFeature RSAT-AD-PowerShell, RSAT-AD-Tools
+    # install dns tools
+    Install-WindowsFeature RSAT-DNS-Server
+
+

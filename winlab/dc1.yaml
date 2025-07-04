@@ -1,0 +1,43 @@
+name: dc1
+parent: dbosoft/winsrv2022-standard
+
+memory: 
+ startup: 2048
+ minimum: 512
+ maximum: 2048
+cpu: 2
+
+variables:
+- name: domain
+  value: winlab.local
+  required: true
+- name: domain_admin
+  required: true
+  value: Administrator
+- name: domain_admin_password
+  secret: true
+  required: true
+- name: safe_mode_password
+  secret: true
+  required: true
+
+fodder:
+- source: gene:dbosoft/starter-food:win-starter
+  name: admin-windows
+  variables:
+  - name: AdminUsername
+    value: '{{ domain_admin }}'
+  - name: AdminPassword
+    value: '{{ domain_admin_password }}'
+- source: gene:dbosoft/starter-food:win-starter
+  name: remote-desktop    
+- source: gene:dbosoft/windsc:setup
+- source: gene:dbosoft/windomain:first-dc
+  variables:
+  - name: domain_name
+    value: '{{ domain }}'
+  - name: domain_admin
+    value: '{{ domain_admin }}'
+  - name: safe_mode_password
+    value: '{{ safe_mode_password }}'  
+   
