@@ -11,6 +11,7 @@ To run the example you need some free memory (between 6 and 12 GB, more is alway
 2. Execute script `setup.ps1` in a **elevated** command prompt. 
 
 The setup script will setup a eryph configuration and a project for the lab. Then it will bootstrap the domain controller and management VM.
+A dedicated client is created automatically so that you can access the project without administrative privileges after running the setup.
 
 You can also add additional member with the `Build-Member` powershell script. It accepts either a Windows Server Version (2019,2022,2025) or a parent name to build a member of your choice. The script is only necessary for orchestration / checking state of member, so you can also just deploy your own catlet into the domain using the `member.yaml` catlet as template. 
 
