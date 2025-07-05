@@ -37,6 +37,8 @@ function Initialize-EryphProjectAndClient {
                 [switch] $ClientAsDefault
         )
 
+        Set-EryphConfigurationStore -All CurrentDirectory
+
         $sysCred = Get-EryphClientCredentials `
                 -SystemClient `
                 -Configuration zero
@@ -53,6 +55,7 @@ function Initialize-EryphProjectAndClient {
         if ($configuration) {
                 $identityClient = Get-EryphClient `
                         -Id $configuration.Id `
+                        
                         -Credentials $sysCred
 
                 if ($identityClient) {
@@ -166,4 +169,104 @@ function Initialize-EryphProjectAndClient {
         }
 }
 
+<#
+    .Synopsis
+    Ensures that eryph client and project are deleted.
+
+    .Description
+    This function checks if a project and client exist in eryph, and deletem them if they do.
+
+    .Parameter ProjectName
+    Name of the project to delete from eryph.
+
+    .Parameter ClientName
+    Name of the client to delete from eryph. Defaults to the project name.
+
+#>
+function Remove-EryphProjectAndClient {
+        param(
+                [Parameter(Mandatory = $true, Position = 0)]
+                [ValidateNotNullOrEmpty()]
+                [string] $ProjectName,
+
+                [Parameter(Mandatory = $false)]
+                [ValidateNotNullOrEmpty()]
+                [string] $ClientName = $ProjectName
+        )
+
+        Set-EryphConfigurationStore -All CurrentDirectory
+
+
+        $sysCred = Get-EryphClientCredentials `
+                -SystemClient `
+                -Configuration zero
+
+        if (-not $sysCred) {
+                return
+        }
+        # Check if client configuration and client exist
+        $configuration = Get-EryphClientConfiguration `
+                -Configuration zero `
+                -ErrorAction SilentlyContinue |
+                Where-Object Name -eq $ClientName
+
+        if ($configuration) {
+                $identityClient = Get-EryphClient `
+                        -Id $configuration.Id `
+                        -Credentials $sysCred `
+                        -ErrorAction SilentlyContinue
+
+                if ($identityClient) {
+                        Write-Information `
+                                "Deleting client '$ClientName'..." `
+                                -InformationAction Continue
+                        $identityClient | Remove-EryphClient `
+                                -Confirm:$false `
+                                -Credentials $sysCred | `
+                                Out-Null
+                }
+
+                Write-Information `
+                        "Deleting client configuration..." `
+                        -InformationAction Continue
+                Remove-EryphClientConfiguration `
+                        -Id $configuration.Id `
+                        -Confirm:$false `
+                        -Force `
+                        -Configuration zero | `
+                        Out-Null
+        }
+        else {
+                Write-Information `
+                        "No client configuration found for '$ClientName'." `
+                        -InformationAction Continue
+        }
+
+        # Check if project exists and create it if not
+        Write-Verbose `
+                "Checking if project '$ProjectName' exists..." `
+                -InformationAction Continue
+        $project = Get-EryphProject `
+                -Credentials $sysCred |
+                Where-Object Name -eq $ProjectName
+
+        if (-not $project) {
+                Write-Information `
+                        "Project '$ProjectName' not found." `
+                        -InformationAction Continue
+        }
+        else {
+                Write-Information `
+                        "Deleting Project '$ProjectName'.." `
+                        -InformationAction Continue
+                Remove-EryphProject `
+                        -Id $project.Id `
+                        -Force `
+                        -Credentials $sysCred | `
+                        Out-Null        
+        }
+
+}        
+
 Export-ModuleMember -Function Initialize-EryphProjectAndClient
+Export-ModuleMember -Function Remove-EryphProjectAndClient
