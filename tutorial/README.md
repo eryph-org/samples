@@ -8,13 +8,12 @@ Just use the files from the tutorial in the catlet YAML editor of the eryph App.
 
 ## Getting Started
 
-Use the eryph app, go to Catlets, New Catlet and copy the Catlet YAML files from this tutorial into the YAML editor.
+If you use the eryph App, go to Catlets, New Catlet. Click on "catlet YAML" to skip the catlet wizard and copy the Catlet YAML files from this tutorial into the YAML editor.
 
 **or**
 
 1. Clone this repository.
 2. Install eryph!  See https://github.com/eryph-org/eryph/blob/main/src/apps/src/Eryph-zero/README.md  
-(If you're still on the waitlist, you can't do this, sorry!)
 3. Open the tutorial folder in a **elevated** PowerShell prompt (as Administrator).
 
 ## Tutorial 0: Basics
