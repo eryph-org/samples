@@ -24,18 +24,10 @@ fodder:
         groups: [ "Administrators" ]
         passwd: '{{ password }}'
 
- - name: setup-dsc
-   type: shellscript
-   fileName: setup_dsc.ps1
-   content: |
-    #ps1
-    $erroractionpreference = "stop"
-    Start-Transcript -Path c:\DSCInstall.log -Append
+ # windsc will setup the DSC environment
+ - source: gene:dbosoft/windsc:setup
 
-    Get-PackageProvider NuGet -ForceBootstrap | Out-Null;
-    Set-PSRepository PSGallery -InstallationPolicy Trusted | Out-Null
-    Install-Module 'PSDscResources' -Force
-
+ # this will prepare the SQLServer DSC configuration
  - name: prepare-sqlserver
    type: shellscript
    fileName: SQLInstallConfiguration.ps1
@@ -75,12 +67,9 @@ fodder:
     . c:\SQLInstallConfiguration.ps1
     SQLInstall
 
- - name: EnablePSRemoting
-   type: shellscript
-   fileName: enable_remoting.ps1
-   content: |
-    Enable-PSRemoting -Force
-
+# running the DSC configuration will install SQL Server
+# after running the configuration, the script will check the status
+# and write the result to c:\SQLInstallStatus.txt
  - name: install-sqlserver
    type: shellscript
    fileName: SQLInstall.ps1
@@ -105,7 +94,6 @@ fodder:
       "failed" | Out-File c:\SQLInstallStatus.txt -Force
     }
     
-    Get-NetFirewallRule -name *ICMP4* | Set-NetFirewallRule -Enabled True
     exit 0
     
 
