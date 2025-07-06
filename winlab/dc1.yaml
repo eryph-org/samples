@@ -3,12 +3,14 @@ parent: dbosoft/winsrv2022-standard
 
 memory: 
  startup: 2048
- minimum: 512
+ minimum: 1024
  maximum: 2048
 cpu: 2
 
 variables:
 - name: domain
+  # the domain name for the domain
+  # in this sample only a single forest is created
   value: winlab.local
   required: true
 - name: domain_admin
@@ -18,10 +20,13 @@ variables:
   secret: true
   required: true
 - name: safe_mode_password
+  # recovery password for the domain controller
   secret: true
   required: true
 
 fodder:
+# this will create the local administrator account
+# which will be turned into a domain admin later
 - source: gene:dbosoft/starter-food:win-starter
   name: admin-windows
   variables:
@@ -29,8 +34,12 @@ fodder:
     value: '{{ domain_admin }}'
   - name: AdminPassword
     value: '{{ domain_admin_password }}'
+
+# enable remote desktop (optional)    
 - source: gene:dbosoft/starter-food:win-starter
   name: remote-desktop    
+
+# windsc is required by windomain fodder  
 - source: gene:dbosoft/windsc:setup
 - source: gene:dbosoft/windomain:first-dc
   variables:
@@ -40,4 +49,3 @@ fodder:
     value: '{{ domain_admin }}'
   - name: safe_mode_password
     value: '{{ safe_mode_password }}'  
-   

@@ -26,6 +26,9 @@ param (
 )
 
 $ErrorActionPreference = 'Stop'
+Import-Module -Name "$PSScriptRoot/../modules/Eryph.InvokeCommand.psm1"
+Import-Module -Name "$PSScriptRoot/../modules/CloudInit.Analyzers.psm1"
+
 
 function Get-AdminCredentials {
     Write-Host
@@ -87,72 +90,40 @@ start-sleep -Seconds 30
 
 $ipInfo = Get-CatletIp -Id $catlet.Id
 $ip = $ipInfo.IpAddress
-$opt = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck
 
-Write-Information "Connecting..." -InformationAction Continue
-
-do{
+Invoke-CommandWinRM -ComputerName $ip -Retry -Credentials $Credentials -scriptblock {
 
     do {
-        $ping = Test-Connection -ComputerName $ip -Count 1 -Quiet
+        
+        $initService = Get-Service -Name cloudbase-init
+        $finished = $initService.Status -eq 'Stopped'
 
-        if (-not $ping) {
-            Write-Information "Waiting for network connection..." -InformationAction Continue
+        if (-not $finished) {
+            Write-Information "Waiting for cloud-init..." -InformationAction Continue
             Start-Sleep -Seconds 10
         }
-    } until ($ping)
+    } until ($finished)
+    
+}
 
-    try{
-        $session = new-PSSession -ComputerName $ip -Credential $Credentials -UseSSL -Authentication Basic -SessionOption $opt
-        if($session) {
-            $winrm = $true
-        } else {
-            Write-Information "Waiting for WinRM connection..." -InformationAction Continue
-            Start-Sleep -Seconds 10    
-            $winrm = $false
-        }
-
-        Invoke-Command -Session $session -scriptblock {
-
-            do {
-                
-                $initService = Get-Service -Name cloudbase-init
-                $finished = $initService.Status -eq 'Stopped'
-
-                if (-not $finished) {
-                    Write-Information "Waiting for cloud-init..." -InformationAction Continue
-                    Start-Sleep -Seconds 10
-                }
-            } until ($finished)
-            
-        }
-
-        $ready = Invoke-Command -Session $session -scriptblock {
-            # check if member has joined the domain
-            $domainJoined = (Get-WmiObject Win32_ComputerSystem).Domain
-            if ($domainJoined -eq 'WORKGROUP') {
-                return $false
-            } else {
-                return $true
-            }
-        }
-
-        if ($ready) {
-            Write-Information "Catlet has joined the domain." -InformationAction Continue
-        } else {
-            Write-Information "Catlet has not joined the domain. Check log:" -InformationAction Continue
-            Invoke-Command -Session $session -scriptblock {
-                Get-Content "C:\Program Files\Cloudbase Solutions\Cloudbase-Init\log\cloudbase-init.log"
-            }
-        }
+$ready = Invoke-CommandWinRM -ComputerName $ip -Retry -Credentials $Credentials -scriptblock {
+    # check if member has joined the domain
+    $domainJoined = (Get-WmiObject Win32_ComputerSystem).Domain
+    if ($domainJoined -eq 'WORKGROUP') {
+        return $false
+    } else {
+        return $true
     }
-    catch {
-        Write-Warning "WinRM Error $_" -ErrorAction Continue
-        Write-Information "WinRM connection failed, retrying..." -InformationAction Continue
-        $winrm = $false
+}
+
+if ($ready) {
+    Write-Information "Catlet has joined the domain." -InformationAction Continue
+} else {
+    Write-Error "Catlet has not joined the domain." -ErrorAction Continue
+    $logContent = Invoke-CommandWinRM -ComputerName $ip -Credentials $Credentials -scriptblock {
+        return Get-Content "C:\Program Files\Cloudbase Solutions\Cloudbase-Init\log\cloudbase-init.log"
     }
+    $logContent | Get-CloudbaseInitUserDataError
 
-} until ($winrm)
+}
 
-
-Remove-PSSession -Session $session

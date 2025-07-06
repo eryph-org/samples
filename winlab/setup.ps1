@@ -34,64 +34,23 @@ function Get-AdminCredentials {
     return $adminCred
 }
 
+Import-Module -Name "$PSScriptRoot/../modules/Eryph.LocalProject.psm1"
+Import-Module -Name "$PSScriptRoot/../modules/Eryph.Check.psm1"
+
 
 Push-Location $PSScriptRoot
 
 Write-Information "Checking if eryph-zero exists..." -InformationAction Continue
+Test-EryphZeroExists
 
-$zeroCommand = Get-Command eryph-zero -ErrorAction SilentlyContinue
-
-if (-not $zeroCommand) {
-    Write-Error "Install eryph-zero to run this example."
-    exit 1
-} else{
-    Write-Information "command 'eryp-zero' found. Assuming eryph-zero is installed." -InformationAction Continue
-}
-
-
-Write-Information "Checking credentials for eryph..." -InformationAction Continue
-
-$sysCred = Get-EryphClientCredentials -SystemClient -Configuration zero
-
-if (-not $sysCred) {
-    return
-}
 
 Set-EryphConfigurationStore -All CurrentDirectory
-$configuration = Get-EryphClientConfiguration -Configuration zero -ErrorAction SilentlyContinue | Where-Object Name -eq 'winlab'
 
-if (-not $configuration) {
-    Write-Information "Creating a new eryph client for this project" -InformationAction Continue
+Write-Information "Checking project and credentials" -InformationAction Continue
+Initialize-EryphProjectAndClient winlab -ClientAsDefault
 
-    Remove-Item .eryph -Recurse -ErrorAction SilentlyContinue
-    new-eryphclient -name winlab -AllowedScopes compute:write -AddToConfiguration -AsDefault -Credentials $sysCred
-} else {
-    Write-Information "Client for eryph exists" -InformationAction Continue
-}
-
-$clientId = (Get-EryphClientConfiguration -Configuration zero -ErrorAction SilentlyContinue | Where-Object Name -eq 'winlab').Id
-
-Write-Information "Checking if eryph project 'winlab' exists..." -InformationAction Continue
-$project = Get-EryphProject -Credentials $sysCred | Where-Object Name -eq 'winlab'
-
-if (-not $project) {
-    Write-Information "Creating a new eryph project" -InformationAction Continue
-    $project = New-EryphProject winlab -Credentials $sysCred
-} else {
-    Write-Information "project 'winlab' found" -InformationAction Continue
-}
-
-
-$role = Get-EryphProjectMemberRole -ProjectName "winlab"  -Credentials $sysCred `
-    | Where-Object { $_.Project.Id -eq ($project.Id) }`
-    | Where-Object MemberId -eq $clientId
-
-if (-not $role) {
-    Write-Information "Adding client to project" -InformationAction Continue
-    Add-EryphProjectMemberRole -ProjectName winlab -MemberId $clientId -Role owner -Credentials $sysCred
-} else {
-    Write-Information "Client is already a member of project" -InformationAction Continue
-}
+# reset project dns of dc1 is not found
+# this may happen if the dc was deleted and setup is run again
 
 $dc1Catlet = Get-Catlet | Where-Object Name -eq dc1
 

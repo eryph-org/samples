@@ -21,6 +21,8 @@ Example:
 .\Build-Node.ps1 -CatletName node1 -Os Linux
 ```
 
+To remove all catlets created for this example you can run the script `cleanup.ps1`.
+
 ## Cinc project
 
 The example setup contains an eryph project called cinc. A dedicated client is created automatically so that you can access the project without administrative privileges. 

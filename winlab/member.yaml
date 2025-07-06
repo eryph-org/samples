@@ -36,12 +36,3 @@ fodder:
     value: '{{ domain_admin }}'
   - name: domain_admin_password
     value: '{{ domain_admin_password }}'  
-- name: member
-  type: shellscript
-  filename: member_settings.ps1
-  content: |
-    # allow winrm
-    Enable-PSRemoting -Force
-    # allow ping 
-    New-NetFirewallRule -DisplayName "Allow ICMPv4-In" -Direction Inbound -Protocol ICMPv4 -IcmpType 8 -Action Allow
-
