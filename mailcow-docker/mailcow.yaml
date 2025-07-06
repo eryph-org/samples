@@ -1,0 +1,48 @@
+name: mailcow
+parent: dbosoft/ubuntu-22.04/latest
+
+variables:
+  - name: username
+    value: admin
+    required: true
+  - name: password
+    value: admin
+    required: true    
+  - name: sshPublicKey
+    required: true
+
+fodder:
+  - source: gene:dbosoft/starter-food:linux-starter
+    variables:
+    - name: sshPublicKey
+      value: '{{ sshPublicKey }}'
+    - name: username
+      value: '{{ username }}'  
+    - name: password
+      value: '{{ password }}'
+    - name: lockPassword
+      value: true
+
+  - name: install-mailcow
+    type: shellscript
+    content: |
+      #!/bin/bash
+      set -e
+
+      echo "Installing docker"
+      curl -sSL https://get.docker.com/ | CHANNEL=stable sh
+      systemctl enable --now docker
+
+      echo "Installing mailcow..."
+      cd /opt
+      git clone https://github.com/mailcow/mailcow-dockerized
+      cd mailcow-dockerized
+
+      export MAILCOW_HOSTNAME="mailcow"
+      export MAILCOW_TZ="UTC"
+      export SKIP_CLAMD=y
+      export MAILCOW_BRANCH=master
+      ./generate_config.sh
+      docker compose pull
+      docker compose up -d
+      echo "Mailcow installation completed."

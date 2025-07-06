@@ -86,7 +86,9 @@ function Invoke-SSH {
         [string] $Username,
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [string] $KeyFilePath
+        [string] $KeyFilePath,
+
+        [switch] $NoErrorCheck
     )
 
     if (-not (Get-Command ssh -ErrorAction SilentlyContinue)) {
@@ -106,12 +108,14 @@ function Invoke-SSH {
         -o 'StrictHostKeyChecking=no' `
         -i $KeyFilePath `
         -C $Command
-
-    if (-not $?) {
+    
+    if (-not $NoErrorCheck -and -not $?) {
+        $result
         throw "The execution of the SSH command failed."
     }
-    
+
     return $result
+    
 }
 
 <#
