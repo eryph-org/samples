@@ -55,7 +55,6 @@ function Initialize-EryphProjectAndClient {
         if ($configuration) {
                 $identityClient = Get-EryphClient `
                         -Id $configuration.Id `
-                        
                         -Credentials $sysCred
 
                 if ($identityClient) {
@@ -80,7 +79,6 @@ function Initialize-EryphProjectAndClient {
                         Remove-EryphClientConfiguration `
                                 -Id $configuration.Id `
                                 -Configuration zero `
-                                -Credentials $sysCred | `
                                 Out-Null
                         $configuration = $null
                 }
@@ -93,8 +91,8 @@ function Initialize-EryphProjectAndClient {
                 New-EryphClient `
                         -Name $ClientName `
                         -AllowedScopes $AllowedScopes `
-                        -AddToConfiguration `
-                        -Credentials $sysCred  | `
+                        -Credentials $sysCred `
+                        -AddToConfiguration |`
                         Out-Null
         }
 
@@ -216,12 +214,11 @@ function Remove-EryphProjectAndClient {
                         -Credentials $sysCred `
                         -ErrorAction SilentlyContinue
 
-                if ($identityClient) {
+                if ($identityClient) {                       
                         Write-Information `
                                 "Deleting client '$ClientName'..." `
                                 -InformationAction Continue
                         $identityClient | Remove-EryphClient `
-                                -Confirm:$false `
                                 -Credentials $sysCred | `
                                 Out-Null
                 }
